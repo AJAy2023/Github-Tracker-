@@ -2,7 +2,8 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-
+require('dotenv').config();
+const PORT = process.env.PORT || 5000;
 app.use(express.json());
 // middleware for the username 
 const Isvalid = (req, res ,next)=>{
@@ -112,6 +113,6 @@ app.get('/',(req, res)=>{
 
 
 
-app.listen(3000 , ()=>{
-    console.log("server is running...");
+app.listen(PORT , ()=>{
+    console.log(`server is running ${PORT}`);
 })
