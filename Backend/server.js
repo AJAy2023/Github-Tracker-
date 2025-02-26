@@ -5,6 +5,7 @@ const axios = require('axios');
 require('dotenv').config();
 const PORT = process.env.PORT || 5000;
 app.use(express.json());
+
 // middleware for the username 
 const Isvalid = (req, res ,next)=>{
     const username = req.params.username;
@@ -16,7 +17,7 @@ const Isvalid = (req, res ,next)=>{
     next();
 };
 // username 
-app.get('/api/user/:username',Isvalid, async (req, res)=>{
+app.get('/:username',Isvalid, async (req, res)=>{
    const username  = req.params.username
    try {
     const response = await axios.get(`https://api.github.com/users/${username}`);
@@ -26,19 +27,21 @@ app.get('/api/user/:username',Isvalid, async (req, res)=>{
 }
 });
  //repo info
-app.get('/api/user/:username/repos', async (req, res)=>{
+ app.get('/:username/repos', async (req, res) => {
     const username = req.params.username;
+    
     try {
-        const response =  await axios.get(`https://api.github.com/users/${username}/repos`);
-        res.json(response.data); 
+        const response = await axios.get(`https://api.github.com/users/${username}/repos`);
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error fetching repositories:", error.message);
+        res.status(400).json({ message: "Repositories not found or invalid username" });
     }
-    catch(error) {
-        res.status(400).json({message:"error repositories is not found"});
-    } 
 });
 
+
 // issues 
-app.get('/api/user/:username/issues', async (req, res)=>{
+app.get('/:username/issues', async (req, res)=>{
    const username  = req.params.username;
    try{
     const response = await axios.get( `https://api.github.com/search/issues?q=author:${username}+type:issue`);
@@ -50,7 +53,7 @@ app.get('/api/user/:username/issues', async (req, res)=>{
    }
 });
  // followers
-app.get('/api/user/:username/followers', async (req, res) => {
+app.get('/:username/followers', async (req, res) => {
     const username = req.params.username;
     try {
         const response = await axios.get(`https://api.github.com/users/${username}/followers`);
@@ -60,7 +63,7 @@ app.get('/api/user/:username/followers', async (req, res) => {
     }
 });
 // following
-app.get('/api/user/:username/following', async (req, res) => {
+app.get('/:username/following', async (req, res) => {
     const username = req.params.username;
     try {
         const response = await axios.get(`https://api.github.com/users/${username}/following`);
@@ -71,7 +74,7 @@ app.get('/api/user/:username/following', async (req, res) => {
 });
 
 // pull-requests
-app.get('/api/user/:username/pull-requests', async (req,res)=>{
+app.get('/:username/pull-requests', async (req,res)=>{
    const username = req.params.username;
    try{
     const response = await axios.get(`https://api.github.com/search/issues?q=author:${username}+is:pr`);
@@ -83,7 +86,7 @@ app.get('/api/user/:username/pull-requests', async (req,res)=>{
    }
 });
 // orgs 
-app.get('/api/user/:username/orgs', async(req, res)=>{
+app.get('/:username/orgs', async(req, res)=>{
     const username  = req.params.username;
     try{
         const response  = await axios.get(`https://api.github.com/users/${username}/orgs`);
@@ -95,10 +98,10 @@ app.get('/api/user/:username/orgs', async(req, res)=>{
     }
 });
 // starred
-app.get('/api/user/:username/starred"', async(req, res)=>{
+app.get('/:username/starred', async(req, res)=>{
     const username = req.params.username;
     try{
-        const response = await axios.get(`https://api.github.com/users/${username}/starred"`);
+        const response = await axios.get(`https://api.github.com/users/${username}/starred`);
         res.send(response.data);
     }
     catch(error)
