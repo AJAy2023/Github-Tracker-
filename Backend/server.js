@@ -2,8 +2,10 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
+const NodeCache = require('node-cache');
 require('dotenv').config();
 const PORT = process.env.PORT || 5000;
+const headers = process.env.GITHUB_TOKEN;
 app.use(express.json());
 
 // middleware for the username 
@@ -20,7 +22,14 @@ const Isvalid = (req, res ,next)=>{
 app.get('/:username',Isvalid, async (req, res)=>{
    const username  = req.params.username
    try {
-    const response = await axios.get(`https://api.github.com/users/${username}`);
+    const response = await axios.get(`https://api.github.com/users/${username}`,
+    {
+        headers : {
+            Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+            Accept : "application/vnd.github.v3+json",
+            "User-Agent" : "Github-tracker"
+        }
+    });
     res.json(response.data);
 } catch (error) {
     res.status(400).json({ message: "Error fetching data" });
@@ -31,7 +40,13 @@ app.get('/:username',Isvalid, async (req, res)=>{
     const username = req.params.username;
     
     try {
-        const response = await axios.get(`https://api.github.com/users/${username}/repos`);
+        const response = await axios.get(`https://api.github.com/users/${username}/repos`,{
+            headers : {
+                Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                Accept : "application/vnd.github.v3+json",
+                "User-Agent" : "Github-tracker"
+            }
+        });
         res.json(response.data);
     } catch (error) {
         console.error("Error fetching repositories:", error.message);
@@ -44,7 +59,15 @@ app.get('/:username',Isvalid, async (req, res)=>{
 app.get('/:username/issues', async (req, res)=>{
    const username  = req.params.username;
    try{
-    const response = await axios.get( `https://api.github.com/search/issues?q=author:${username}+type:issue`);
+    const response = await axios.get( `https://api.github.com/search/issues?q=author:${username}+type:issue`,
+        {
+            headers : {
+                Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                Accept : "application/vnd.github.v3+json",
+                "User-Agent" : "Github-tracker"
+            }
+        }
+    );
     res.send(response.data.items);
    }
    catch(error)
@@ -56,7 +79,15 @@ app.get('/:username/issues', async (req, res)=>{
 app.get('/:username/followers', async (req, res) => {
     const username = req.params.username;
     try {
-        const response = await axios.get(`https://api.github.com/users/${username}/followers`);
+        const response = await axios.get(`https://api.github.com/users/${username}/followers`,
+            {
+                headers : {
+                    Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                    Accept : "application/vnd.github.v3+json",
+                    "User-Agent" : "Github-tracker"
+                }
+            }
+        );
         res.json(response.data);
     } catch (error) {
         res.status(400).json({ message: "Error fetching followers" });
@@ -66,7 +97,15 @@ app.get('/:username/followers', async (req, res) => {
 app.get('/:username/following', async (req, res) => {
     const username = req.params.username;
     try {
-        const response = await axios.get(`https://api.github.com/users/${username}/following`);
+        const response = await axios.get(`https://api.github.com/users/${username}/following`,
+            {
+                headers : {
+                    Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                    Accept : "application/vnd.github.v3+json",
+                    "User-Agent" : "Github-tracker"
+                }
+            }
+        );
         res.json(response.data);
     } catch (error) {
         res.status(400).json({ message: "Error fetching following users" });
@@ -77,7 +116,15 @@ app.get('/:username/following', async (req, res) => {
 app.get('/:username/pull-requests', async (req,res)=>{
    const username = req.params.username;
    try{
-    const response = await axios.get(`https://api.github.com/search/issues?q=author:${username}+is:pr`);
+    const response = await axios.get(`https://api.github.com/search/issues?q=author:${username}+is:pr`,
+        {
+            headers : {
+                Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                Accept : "application/vnd.github.v3+json",
+                "User-Agent" : "Github-tracker"
+            }
+        }
+    );
     res.send(response.data.items);
    }
    catch(error)
@@ -89,7 +136,15 @@ app.get('/:username/pull-requests', async (req,res)=>{
 app.get('/:username/orgs', async(req, res)=>{
     const username  = req.params.username;
     try{
-        const response  = await axios.get(`https://api.github.com/users/${username}/orgs`);
+        const response  = await axios.get(`https://api.github.com/users/${username}/orgs`,
+            {
+                headers : {
+                    Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                    Accept : "application/vnd.github.v3+json",
+                    "User-Agent" : "Github-tracker"
+                }
+            }
+        );
         res.send(response.data);
     }
     catch(error)
@@ -101,7 +156,15 @@ app.get('/:username/orgs', async(req, res)=>{
 app.get('/:username/starred', async(req, res)=>{
     const username = req.params.username;
     try{
-        const response = await axios.get(`https://api.github.com/users/${username}/starred`);
+        const response = await axios.get(`https://api.github.com/users/${username}/starred`,
+            {
+                headers : {
+                    Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
+                    Accept : "application/vnd.github.v3+json",
+                    "User-Agent" : "Github-tracker"
+                }
+            }
+        );
         res.send(response.data);
     }
     catch(error)
