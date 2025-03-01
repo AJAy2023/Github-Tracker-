@@ -2,9 +2,10 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-require('dotenv').config(); 
-const PORT = process.env.PORT || 5000;
+require('dotenv').config({ path: 'E:\\Projects\\github-Tracker\\Github-Tracker-\\Backend\\.env' });
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const PORT = process.env.PORT || 5000;
+
 
 if (!GITHUB_TOKEN) {
     console.error(" GITHUB_TOKEN is missing! Add it to your .env file.");
