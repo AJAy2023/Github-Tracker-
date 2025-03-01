@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node -r dotenv/config Backend/server.js"
+    "start": "node Backend/server.js"
   },
   "author": "",
   "license": "ISC",
