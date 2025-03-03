@@ -14,7 +14,8 @@ if (!GITHUB_TOKEN) {
 
 // cache setup
 const NodeCache = require('node-cache');
-const cache = new NodeCache({stdTTL: 3600});
+const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
+
 
 
 app.use(express.json());
@@ -98,32 +99,43 @@ app.get("/:username", Isvalid, async (req, res) => {
 
 
 // issues 
-app.get('/:username/issues', async (req, res)=>{
-   const username  = req.params.username;
-   const cacheKey = `issues-${username}`;
-   const cachedata = cache.get(cacheKey);
-   if(cachedata)
-   {
-    return res.json(cachedata)
-   }
-   try{
-    const response = await axios.get( `https://api.github.com/search/issues?q=author:${username}+type:issue`,
-        {
-            headers : {
-                Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
-                Accept : "application/vnd.github.v3+json",
-                "User-Agent" : "Github-tracker"
+app.get('/:username/issues', async (req, res) => {
+    const username = req.params.username;
+    const cacheKey = `issues-${username}`;
+    const cacheData = cache.get(cacheKey);
+
+    if (cacheData) {
+        return res.json(cacheData);
+    }
+
+    try {
+        const response = await axios.get(
+            `https://api.github.com/search/issues?q=author:${username}+is:issue`,
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                    Accept: "application/vnd.github.v3+json",
+                    "User-Agent": "Github-tracker"
+                }
             }
+        );
+
+        const issues = response.data.items || [];
+
+        // Cache the data with an expiration time (e.g., 10 minutes)
+        cache.set(cacheKey, issues, 600);
+
+        if (issues.length === 0) {
+            return res.json({ message: "No issues found for this user." });
         }
-    );
-    cache.set(cacheKey, response.data);
-    res.send(response.data.items);
-   }
-   catch(error)
-   {
-    res.status(400).json({message: "Not yet solved any issues or invalid username" });
-   }
+
+        res.json(issues);
+    } catch (error) {
+        console.error("Error fetching issues:", error.message);
+        res.status(500).json({ message: "Error fetching issues from GitHub." });
+    }
 });
+
  // followers
 app.get('/:username/followers', async (req, res) => {
     const username = req.params.username;
@@ -176,32 +188,43 @@ app.get('/:username/following', async (req, res) => {
 });
 
 // pull-requests
-app.get('/:username/pull-requests', async (req,res)=>{
-   const username = req.params.username;
-   const cacheKey = `pull-requests-${username}`;
-   const cachedata = cache.get(cacheKey);
-   if(cachedata)
-   {
-    return res.json(cachedata)
-   }
-   try{
-    const response = await axios.get(`https://api.github.com/search/issues?q=author:${username}+is:pr`,
-        {
-            headers : {
-                Authorization : `Bearer ${process.env.GITHUB_TOKEN}`,
-                Accept : "application/vnd.github.v3+json",
-                "User-Agent" : "Github-tracker"
+app.get('/:username/pull-requests', async (req, res) => {
+    const username = req.params.username;
+    const cacheKey = `pull-requests-${username}`;
+    const cacheData = cache.get(cacheKey);
+
+    if (cacheData) {
+        return res.json(cacheData);
+    }
+
+    try {
+        const response = await axios.get(
+            `https://api.github.com/search/issues?q=author:${username}+is:pr`,
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                    Accept: "application/vnd.github.v3+json",
+                    "User-Agent": "Github-tracker"
+                }
             }
+        );
+
+        const pullRequests = response.data.items || [];
+
+    
+        cache.set(cacheKey, pullRequests, 600);
+
+        if (pullRequests.length === 0) {
+            return res.json({ message: "No pull requests found for this user." });
         }
-    );
-    cache.set(cacheKey, response.data);
-    res.send(response.data.items);
-   }
-   catch(error)
-   {
-    res.status(400).json({message:"users not yet created any pull request"});
-   }
+
+        res.json(pullRequests);
+    } catch (error) {
+        console.error("Error fetching pull requests:", error.message);
+        res.status(500).json({ message: "Error fetching pull requests from GitHub." });
+    }
 });
+
 // orgs 
 app.get('/:username/orgs', async(req, res)=>{
     const username  = req.params.username;
