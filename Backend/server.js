@@ -1,5 +1,6 @@
 
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const axios = require('axios');
 require('dotenv').config({ path: 'E:\\Projects\\github-Tracker\\Github-Tracker-\\Backend\\.env' });
@@ -12,10 +13,30 @@ if (!GITHUB_TOKEN) {
     process.exit(1);
 }
 
+//  Enable CORS for Specific Origins
+const allowedOrigins = [
+    "chrome-extension://hfaaphgdjehnaiglhgfbnceebiiogpep",
+    "http://127.0.0.1:5500",
+    "http://localhost:3000"
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("CORS policy does not allow this origin!"));
+}
+}
+}));
+
+
+
+
 // cache setup
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
-
+    
 
 
 app.use(express.json());
