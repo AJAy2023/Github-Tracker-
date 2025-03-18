@@ -34,6 +34,7 @@ GitHub Activity Tracker is a lightweight and fast Chrome Extension that allows u
 2. Enter a GitHub username and press **Fetch Data**.
 3. The extension will display the user's latest GitHub activity.
 
+   
 ## 📷 Screenshot 
 ![image](https://github.com/user-attachments/assets/00472736-0777-4294-9830-281c3692a6ef)
 ![image](https://github.com/user-attachments/assets/8ac72c67-b822-42cd-88c3-07dcb92fd4ae)
